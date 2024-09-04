@@ -61,23 +61,64 @@ def get_target(team):
         except ValueError:
             print("请输入一个有效的数字。")
 
-def game_turn(player_team, computer_team):
-    # 玩家回合
-    display_team_status(computer_team, "黑队")
-    for i,archer in enumerate(player_team):
-        if archer.is_alive():
+# def game_turn(player_team, computer_team):
+#     # 玩家回合
+#     display_team_status(computer_team, "黑队")
+#     for i,archer in enumerate(player_team):
+#         if archer.is_alive():
         
-         target = get_target(computer_team)
-         computer_team[target].take_damage(20)
-         print(f"你命令 {archer.name}射击了 {computer_team[target].name}！")
+#          target = get_target(computer_team)
+#          computer_team[target].take_damage(20)
+#          print(f"你命令 {archer.name}射击了 {computer_team[target].name}！")
 
-    # 电脑回合
-    living_targets = [archer for archer in player_team if archer.is_alive()]
-    for i,archer in enumerate(computer_team):
-        if archer.is_alive(): 
-          target = random.choice(living_targets)
-          target.take_damage(20)
-          print(f"电脑{archer.name}射击了 {target.name}！")
+#     # 电脑回合
+#     living_targets = [archer for archer in player_team if archer.is_alive()]
+#     for i,archer in enumerate(computer_team):
+#         if archer.is_alive(): 
+#           target = random.choice(living_targets)
+#           target.take_damage(20)
+#           print(f"电脑{archer.name}射击了 {target.name}！")
+
+
+
+def game_turn(player_team, computer_team):
+    # display_team_status(player_team, "红队")
+    # display_team_status(computer_team, "黑队")
+    # 玩家选择目标
+    player_targets = []
+    for i, archer in enumerate(player_team):
+        if archer.is_alive():
+            target = get_target(computer_team)
+            player_targets.append((i, target))
+    
+    # 电脑选择目标
+    computer_targets = []
+    living_targets = [i for i, archer in enumerate(player_team) if archer.is_alive()]
+    for i, archer in enumerate(computer_team):
+        if archer.is_alive():
+            target = random.choice(living_targets)
+            computer_targets.append((i, target))
+    
+    # # 显示电脑队伍状态
+    # display_team_status(computer_team, "黑队")
+    
+    # 玩家射击
+    for player_index, target_index in player_targets:
+        computer_team[target_index].take_damage(20)
+        print(f"你命令 {player_team[player_index].name} 射击了 {computer_team[target_index].name}！")
+    
+    # 显示玩家队伍状态
+    # display_team_status(player_team, "红队")
+    
+    # 电脑射击
+    for computer_index, target_index in computer_targets:
+        player_team[target_index].take_damage(20)
+        print(f"电脑 {computer_team[computer_index].name} 射击了 {player_team[target_index].name}！")     
+
+
+    display_team_status(player_team, "红队")
+    display_team_status(computer_team, "黑队")
+
 
 def check_game_over(player_team, computer_team):
     player_alive = any(archer.is_alive() for archer in player_team)
@@ -98,7 +139,7 @@ def main():
     
     while True:
         game_turn(player_team, computer_team)
-        display_team_status(player_team, "红队")
+        # display_team_status(player_team, "红队")
         if check_game_over(player_team, computer_team):
             break
 
