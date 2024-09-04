@@ -1,6 +1,7 @@
 import random
 
 LONG_ATTACK_NUM = 10
+LONG_DEFENCE_NUM = 0
 
 
 techplus_long_attack = 1
@@ -13,14 +14,14 @@ class Archer:
     def __init__(self, name):
         self.name = name
         self.hp = 100
-        self.long_attack_num = LONG_ATTACK_NUM
-        self.long_defence_num = LONG_ATTACK_NUM
+        self.long_attack_num = LONG_ATTACK_NUM + techplus_long_attack
+        self.long_defence_num = LONG_DEFENCE_NUM + techplus_long_defence
 
     def is_alive(self):
         return self.hp > 0
 
     def take_damage(self, damage):
-        self.hp -= damage
+        self.hp -= damage - self.long_defence_num 
         if self.hp < 0:
             self.hp = 0
 
@@ -61,25 +62,6 @@ def get_target(team):
         except ValueError:
             print("请输入一个有效的数字。")
 
-# def game_turn(player_team, computer_team):
-#     # 玩家回合
-#     display_team_status(computer_team, "黑队")
-#     for i,archer in enumerate(player_team):
-#         if archer.is_alive():
-        
-#          target = get_target(computer_team)
-#          computer_team[target].take_damage(20)
-#          print(f"你命令 {archer.name}射击了 {computer_team[target].name}！")
-
-#     # 电脑回合
-#     living_targets = [archer for archer in player_team if archer.is_alive()]
-#     for i,archer in enumerate(computer_team):
-#         if archer.is_alive(): 
-#           target = random.choice(living_targets)
-#           target.take_damage(20)
-#           print(f"电脑{archer.name}射击了 {target.name}！")
-
-
 
 def game_turn(player_team, computer_team):
     # display_team_status(player_team, "红队")
@@ -104,7 +86,7 @@ def game_turn(player_team, computer_team):
     
     # 玩家射击
     for player_index, target_index in player_targets:
-        computer_team[target_index].take_damage(20)
+        computer_team[target_index].take_damage(player_team[player_index].long_attack_num)
         print(f"你命令 {player_team[player_index].name} 射击了 {computer_team[target_index].name}！")
     
     # 显示玩家队伍状态
@@ -112,7 +94,7 @@ def game_turn(player_team, computer_team):
     
     # 电脑射击
     for computer_index, target_index in computer_targets:
-        player_team[target_index].take_damage(20)
+        player_team[target_index].take_damage(computer_team[computer_index].long_attack_num)
         print(f"电脑 {computer_team[computer_index].name} 射击了 {player_team[target_index].name}！")     
 
 
