@@ -2,6 +2,9 @@ import arcade
 import arcade.gui
 import time
 from arcade.gui import UIManager, UIFlatButton, UIInputText, UIBoxLayout, UILabel
+from map.load_map import load_map_from_csv  # 导入地图加载函数
+from entites.soldier import Engineer, Medic, Assault, Support  # 导入士兵类
+from entites.actions import MoveAction, AttackAction, HealAction, BuildObstacleAction, ReloadAction, AimAndAttackAction  # 导入动作类
 
 # 设置默认游戏窗口大小
 DEFAULT_SCREEN_WIDTH = 800
@@ -10,6 +13,10 @@ SCREEN_TITLE = "2D Turn-Based Strategy Game"
 
 # 回合间的延迟
 TURN_DELAY = 0.1  # 每个回合至少持续0.1秒
+
+# 地图文件路径
+TERRAIN_FILE = "terrain_map.csv"
+HEIGHT_FILE = "height_map.csv"
 
 
 class MainMenuView(arcade.View):
@@ -167,7 +174,8 @@ class TurnBasedStrategyGame(arcade.View):
         self.turn_counter = 0  # 当前回合计数
         self.player_units = []  # 玩家单位列表
         self.enemy_units = []  # 敌方单位列表
-        self.map = None  # 地图对象
+        self.terrain_map = None  # 地形地图
+        self.height_map = None  # 高度地图
 
     def setup(self):
         """游戏开始前的设置"""
@@ -180,14 +188,25 @@ class TurnBasedStrategyGame(arcade.View):
         self.initialize_units()
 
     def load_map(self):
-        """加载或生成地图"""
-        # 这里可以加载Tiled地图，或者调用随机地图生成器
-        pass
+        """加载地图"""
+        self.terrain_map, self.height_map = load_map_from_csv(TERRAIN_FILE, HEIGHT_FILE)
 
     def initialize_units(self):
         """初始化玩家和敌方单位"""
-        # 这里可以添加玩家和敌人的单位，设置初始位置
-        pass
+        # 创建玩家和敌方的士兵
+        self.player_units = [
+            Engineer(100, 100, "蓝方"),
+            Medic(150, 100, "蓝方"),
+            Assault(200, 100, "蓝方"),
+            Support(250, 100, "蓝方")
+        ]
+
+        self.enemy_units = [
+            Engineer(500, 500, "红方"),
+            Medic(550, 500, "红方"),
+            Assault(600, 500, "红方"),
+            Support(650, 500, "红方")
+        ]
 
     def on_show(self):
         """当这个视图显示时"""
@@ -211,11 +230,14 @@ class TurnBasedStrategyGame(arcade.View):
     def draw_map(self):
         """绘制地图"""
         # 在这里绘制地图，例如通过Arcade的TileMap类来渲染Tiled地图
-        pass
+        for row in range(len(self.terrain_map)):
+            for col in range(len(self.terrain_map[0])):
+                # 根据 terrain_map 和 height_map 绘制地图地块
+                pass  # 你可以根据之前的 load_map.py 进行细化
 
     def on_update(self, delta_time):
         """游戏逻辑更新，每帧调用"""
-        # 控制回合系统，每0.1秒更新一次
+        # 控制回合系统
         self.handle_turn_logic()
 
     def handle_turn_logic(self):
@@ -223,41 +245,29 @@ class TurnBasedStrategyGame(arcade.View):
         self.turn_counter += 1
         print(f"Executing turn {self.turn_counter}")
 
-        # 暂时模拟回合的延时
-        time.sleep(TURN_DELAY)
-
-        # 执行回合操作，比如单位移动和攻击逻辑
+        # 执行回合操作，先攻击再移动
         for unit in self.player_units:
-            unit.take_turn()
+            enemies_in_range = [enemy for enemy in self.enemy_units if unit.distance_to(enemy) <= unit.weapon.range]
+            if enemies_in_range:
+                action = AttackAction(unit, enemies_in_range[0])
+            else:
+                action = MoveAction(unit, 300, 300)  # 示例移动到某个位置
+            action.execute()
+
+        # 同样处理敌方单位的回合逻辑
         for unit in self.enemy_units:
-            unit.take_turn()
+            enemies_in_range = [enemy for enemy in self.player_units if unit.distance_to(enemy) <= unit.weapon.range]
+            if enemies_in_range:
+                action = AttackAction(unit, enemies_in_range[0])
+            else:
+                action = MoveAction(unit, 600, 600)  # 示例移动到某个位置
+            action.execute()
 
     def on_key_press(self, key, modifiers):
         """处理按键事件"""
         if key == arcade.key.ESCAPE:
             main_menu = MainMenuView()
             self.window.show_view(main_menu)
-
-
-class Unit:
-    """示例单位类"""
-
-    def __init__(self, x, y, color):
-        self.x = x
-        self.y = y
-        self.color = color
-        self.radius = 10
-
-    def draw(self):
-        """绘制单位"""
-        arcade.draw_circle_filled(self.x, self.y, self.radius, self.color)
-
-    def take_turn(self):
-        """单位执行回合逻辑"""
-        # 示例：单位随机移动
-        import random
-        self.x += random.randint(-5, 5)
-        self.y += random.randint(-5, 5)
 
 
 def main():
