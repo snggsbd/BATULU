@@ -3,8 +3,8 @@ import csv
 import os
 
 # 地图尺寸
-MAP_WIDTH = 2000  # 地图宽度，单位：格子
-MAP_HEIGHT = 2000  # 地图高度，单位：格子
+MAP_WIDTH = 1000  # 地图宽度，单位：格子
+MAP_HEIGHT = 1000  # 地图高度，单位：格子
 
 # 地形类型
 EMPTY = 0  # 空地

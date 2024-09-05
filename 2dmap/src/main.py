@@ -227,13 +227,53 @@ class TurnBasedStrategyGame(arcade.View):
         for unit in self.enemy_units:
             unit.draw()
 
-    def draw_map(self):
-        """绘制地图"""
-        # 在这里绘制地图，例如通过Arcade的TileMap类来渲染Tiled地图
+    def setup(self):
+        """游戏开始前的设置"""
+        arcade.set_background_color(arcade.color.ASH_GREY)
+
+        # 加载地图
+        self.load_map()
+
+        # 初始化单位
+        self.initialize_units()
+
+        # 初始化地图渲染
+        self.map_sprites = arcade.SpriteList()  # 创建一个地图的SpriteList
+        self.initialize_map_sprites()
+
+    def initialize_map_sprites(self):
+        """将地图的每个地块初始化为Sprite，并添加到SpriteList"""
+        tile_size = 5  # 每个地块的大小（像素）
+
         for row in range(len(self.terrain_map)):
             for col in range(len(self.terrain_map[0])):
-                # 根据 terrain_map 和 height_map 绘制地图地块
-                pass  # 你可以根据之前的 load_map.py 进行细化
+                terrain_type = self.terrain_map[row][col]  # 获取地形类型
+                height = self.height_map[row][col]  # 获取高度信息（暂时未使用）
+
+                # 根据地形类型选择颜色
+                if terrain_type == 0:  # 空地
+                    color = arcade.color.LIGHT_YELLOW
+                elif terrain_type == 1:  # 障碍物
+                    color = arcade.color.BLACK
+                elif terrain_type == 2:  # 水域
+                    color = arcade.color.BLUE
+                elif terrain_type == 3:  # 山地
+                    color = arcade.color.YELLOW
+                else:
+                    color = arcade.color.WHITE  # 未知地形类型
+
+                # 创建一个Sprite并设置它的位置和颜色
+                sprite = arcade.SpriteSolidColor(tile_size, tile_size, color)
+                sprite.center_x = col * tile_size + tile_size / 2
+                sprite.center_y = row * tile_size + tile_size / 2
+
+                # 将Sprite添加到SpriteList
+                self.map_sprites.append(sprite)
+
+    def draw_map(self):
+        """绘制地图"""
+        self.map_sprites.draw()  # 只需要绘制缓存的SpriteList
+
 
     def on_update(self, delta_time):
         """游戏逻辑更新，每帧调用"""

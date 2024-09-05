@@ -15,10 +15,10 @@ MOUNTAIN = 3  # 山地
 
 # 颜色定义（用于渲染）
 COLOR_MAPPING = {
-    EMPTY: arcade.color.LIGHT_GRAY,   # 空地颜色
-    OBSTACLE: arcade.color.DARK_BROWN,   # 障碍物颜色
-    WATER: arcade.color.BLUE,   # 水域颜色
-    MOUNTAIN: arcade.color.DARK_SLATE_GRAY   # 山地颜色
+    EMPTY: arcade.color.LIGHT_YELLOW,  # 空地：浅黄色
+    OBSTACLE: arcade.color.BLACK,  # 障碍物：黑色
+    WATER: arcade.color.BLUE,  # 水域：蓝色
+    MOUNTAIN: arcade.color.YELLOW  # 山地：黄色
 }
 
 def load_map_from_csv(terrain_filename, height_filename):
